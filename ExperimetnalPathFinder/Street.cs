@@ -10,7 +10,6 @@ namespace ExperimetnalPathFinder
     {
         public string name;
         public List<Road> roads;
-        public List<Intersection> intersections;
         public bool isHorizontal;
         public int length;
     }

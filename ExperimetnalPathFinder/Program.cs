@@ -15,12 +15,11 @@ namespace ExperimetnalPathFinder
             Map.streetMap = new Street[Map.mapHeight, Map.mapWidth];
             Map.GenHorizontalStreets();
             Map.GenVerticalStreets();
-            Map.GenIntersectionMap();
-            Map.LinkIntersections();
+            Map.MarkAllIntersections();
+            Map.BuildAllIntersections();
             Map.PrintBaseMap();
             System.Console.WriteLine();
             Map.PrintStreetAndIntersectionMap();
-            List<Intersection> intersectionList = Map.intersectionList;
             System.Console.Read();
         }
     }
