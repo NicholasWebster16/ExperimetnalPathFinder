@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,10 +9,16 @@ namespace ExperimetnalPathFinder
     class Waypoint
     {
         private Road road;
-        private Waypoint prevWaypoint;
+        private Waypoint previousWaypoint;
         private Waypoint nextWaypoint;
+
+        public Waypoint(Road _road)
+        {
+            road = _road;
+        }
+
         public Road Road { get => road; set => road = value; }
-        internal Waypoint PrevWaypoint { get => prevWaypoint; set => prevWaypoint = value; }
-        internal Waypoint NextWaypoint { get => nextWaypoint; set => nextWaypoint = value; }
+        public Waypoint PreviousWaypoint { get => previousWaypoint; set => previousWaypoint = value; }
+        public Waypoint NextWaypoint { get => nextWaypoint; set => nextWaypoint = value; }
     }
 }

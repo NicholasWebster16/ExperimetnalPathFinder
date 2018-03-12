@@ -164,7 +164,7 @@ namespace ExperimetnalPathFinder
             }
         }    
 
-
+        /*
         public static bool[] AdjacentRoadCheck(Road inputRoad)
         {
             bool[] returnChecks = new bool[4];
@@ -186,6 +186,7 @@ namespace ExperimetnalPathFinder
             }
             return returnChecks;
         }
+        */
 
         public static string GetStreetName(bool isHorizontal, int streetNumber)
         {
