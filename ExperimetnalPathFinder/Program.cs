@@ -20,8 +20,10 @@ namespace ExperimetnalPathFinder
             Map.PrintBaseMap();
             System.Console.WriteLine();
             Map.PrintStreetAndIntersectionMap();
+            Map.TestPathFinding();
             System.Console.Read();
         }
+        
     }
 
 }

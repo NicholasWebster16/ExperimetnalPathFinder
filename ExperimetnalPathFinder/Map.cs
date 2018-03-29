@@ -348,5 +348,15 @@ namespace ExperimetnalPathFinder
             }
             System.Console.WriteLine(closingLines);
         }
+
+        public static void TestPathFinding()
+        {
+            System.Console.WriteLine("Testing Pathfinding");
+            Road source = roadMap[1, 0];
+            Road dest = roadMap[9, 9];
+            Path newPath = Path.FindPath(source, dest);
+            System.Console.WriteLine("Pathfinding Complete");
+
+        }
     }
 }
