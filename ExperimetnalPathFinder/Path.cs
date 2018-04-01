@@ -8,42 +8,27 @@ namespace ExperimetnalPathFinder
 {
     class Path
     {
-        List<Waypoint> waypoints;
-        Road source;
-        Road dest;
-        int distActual;
+        protected List<Road> waypoints;
+        protected int distActual;
 
-        public class PathOpen : Path, ICloneable
+        public class PathOpen : Path
         {
+            public Road destination;
             public int distActualWorking;
-            public int distEstimateRemaining;
-            public Map.Direction lastDirection;
             public int GetDistWorkingTotal()
             {
-                return distActualWorking + distEstimateRemaining;
+                return distActualWorking + EstimateDistance(waypoints.Last(), destination);
             }
+            
 
 
-            public PathOpen(Road _source, Road _dest)
+            public PathOpen(Road source, Road dest)
             {
-                source = _source;
-                dest = _dest;
+                destination = dest;
                 distActualWorking = 0;
-                distEstimateRemaining = EstimateDistance(source, dest);
-                Waypoint initalWaypoint = new Waypoint(source);
-                waypoints = new List<Waypoint>();
-                waypoints.Add(initalWaypoint);
+                waypoints.Add(source);
             }
-
-            public object Clone()
-            {
-                PathOpen clone = (PathOpen)this.MemberwiseClone();
-                Waypoint[] clonedWaypoints = new Waypoint[this.waypoints.Count];
-                this.waypoints.CopyTo(clonedWaypoints);
-                clone.waypoints = clonedWaypoints.OfType<Waypoint>().ToList();
-                return clone;
-
-            }
+            
         }
 
         public static Path FindPath(Road source, Road dest)
@@ -59,7 +44,7 @@ namespace ExperimetnalPathFinder
                 PathOpen workingPath = openPaths[0];
                 openPaths.RemoveAt(0);
                 // Checks if the working path is on the same street as the destination.
-                if (AreSameStreet(workingPath.waypoints.Last().Road, dest))
+                if (AreSameStreet(workingPath.waypoints.Last(), dest))
                 {
                     // If it's on the same street finalize the working path
                     Path finalizedPath = FinalizePathOpen(workingPath);
@@ -95,9 +80,7 @@ namespace ExperimetnalPathFinder
             finalizedPath.waypoints = pathOpen.waypoints;
             int finalDist = pathOpen.GetDistWorkingTotal();
             finalizedPath.distActual = finalDist;
-            Waypoint newWaypoint = new Waypoint(pathOpen.dest);
-            pathOpen.waypoints.Last().NextWaypoint = newWaypoint;
-            pathOpen.waypoints.Add(newWaypoint);
+            finalizedPath.waypoints.Add(pathOpen.destination);
             return pathOpen;
         }
 
@@ -108,16 +91,12 @@ namespace ExperimetnalPathFinder
 
             foreach(Map.Direction dir in directions)
             {
-                if (root.waypoints.Last().Road.GetIntersectionLink(dir) != null)
+                if (root.waypoints.Last().GetIntersectionLink(dir) != null)
                 {
-                    PathOpen newPath = (PathOpen)root.Clone();
-                    int addDist = root.waypoints.Last().Road.GetLinkDistance(dir);
+                    PathOpen newPath = (PathOpen)root.MemberwiseClone();
+                    int addDist = root.waypoints.Last().GetLinkDistance(dir);
                     newPath.distActual += addDist;
-                    Waypoint newWaypoint = new Waypoint(root.waypoints.Last().Road.GetIntersectionLink(dir));
-                    newPath.waypoints.Last().NextWaypoint = newWaypoint;
-                    newWaypoint.PreviousWaypoint = root.waypoints.Last();
-                    newPath.waypoints.Add(newWaypoint);
-                    newPath.distEstimateRemaining = EstimateDistance(newWaypoint.Road, newPath.dest);
+                    newPath.waypoints.Add(root.waypoints.Last().GetIntersectionLink(dir));
                     pathBranches.Add(newPath);
                 }
             }
@@ -139,34 +118,6 @@ namespace ExperimetnalPathFinder
         public static int EstimateDistance(Road r1, Road r2)
         {
             return (int)Math.Abs(r2.Loc.X - r1.Loc.X) + (int)Math.Abs(r2.Loc.Y - r1.Loc.Y);
-        }
-
-        public static void TestCloning()
-        {
-            Road testSource = new Road();
-            testSource.StreetAddress = 42;
-            Road testDest = new Road();
-            testDest.StreetAddress = 100;
-            Road testRoad = new Road();
-            testRoad.StreetAddress = 66;
-            Waypoint testWaypoint1 = new Waypoint(testSource);
-            Waypoint testWaypoint2 = new Waypoint(testDest);
-            Waypoint testWaypoint3 = new Waypoint(testRoad);
-
-
-
-            PathOpen originalPath = new PathOpen(testSource, testDest);
-            originalPath.lastDirection = Map.Direction.North;
-            originalPath.waypoints.Add(testWaypoint1);
-
-            PathOpen clonedPath = (PathOpen)originalPath.Clone() ;
-            PathOpen clonedPath2 = (PathOpen)originalPath.Clone();
-            clonedPath.waypoints.Add(testWaypoint2);
-            clonedPath.dest = testRoad;
-            clonedPath.distActual = 6000;
-            clonedPath.distEstimateRemaining = 2000;
-            clonedPath.source = testRoad;
-            
         }
     }
 }
