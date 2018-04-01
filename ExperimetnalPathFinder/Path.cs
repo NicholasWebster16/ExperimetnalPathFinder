@@ -8,10 +8,10 @@ namespace ExperimetnalPathFinder
 {
     class Path
     {
-        protected List<Road> waypoints;
-        protected int distActual;
+        public List<Road> waypoints;
+        public int distActual;
 
-        public class PathOpen : Path
+        public class PathOpen : Path, ICloneable
         {
             public Road destination;
             public int distActualWorking;
@@ -19,11 +19,17 @@ namespace ExperimetnalPathFinder
             {
                 return distActualWorking + EstimateDistance(waypoints.Last(), destination);
             }
-            
 
+            public object Clone()
+            {
+                PathOpen newPath = (PathOpen)this.MemberwiseClone();
+                newPath.waypoints = new List<Road>(this.waypoints);
+                return newPath;
+            }
 
             public PathOpen(Road source, Road dest)
             {
+                waypoints = new List<Road>();
                 destination = dest;
                 distActualWorking = 0;
                 waypoints.Add(source);
@@ -54,24 +60,31 @@ namespace ExperimetnalPathFinder
                         // Then Update the shortest path.
                         shortestPathFound = finalizedPath;
                         shortestDistFound = finalizedPath.distActual;
-                        for (int i = 0; i < openPaths.Count; i++)
-                        {
-                            // Cull openPaths
-                            if (openPaths[i].GetDistWorkingTotal() > shortestDistFound)
-                            {
-                                openPaths.Remove(openPaths[i]);
-                            }
-                        }
+                        openPaths = CullOpenPaths(openPaths, shortestDistFound);
                     }
                 }
                 else
                 {
                     List<PathOpen> branchedPath = BranchPath(workingPath, shortestDistFound);
                     openPaths.AddRange(branchedPath);
+                    openPaths = CullOpenPaths(openPaths, shortestDistFound);
                     openPaths.OrderBy(x => x.GetDistWorkingTotal()).ToList();
                 }
             }
             return shortestPathFound;
+        }
+
+        public static List<PathOpen> CullOpenPaths(List<PathOpen> openPaths, int cutoff)
+        {
+            for (int i = 0; i < openPaths.Count; i++)
+            {
+                // Cull openPaths
+                if (openPaths[i].GetDistWorkingTotal() >= cutoff)
+                {
+                    openPaths.Remove(openPaths[i]);
+                }
+            }
+            return openPaths;
         }
 
         public static Path FinalizePathOpen(PathOpen pathOpen)
@@ -81,7 +94,7 @@ namespace ExperimetnalPathFinder
             int finalDist = pathOpen.GetDistWorkingTotal();
             finalizedPath.distActual = finalDist;
             finalizedPath.waypoints.Add(pathOpen.destination);
-            return pathOpen;
+            return finalizedPath;
         }
 
         public static List<PathOpen> BranchPath(PathOpen root, int maxDist)
@@ -91,11 +104,20 @@ namespace ExperimetnalPathFinder
 
             foreach(Map.Direction dir in directions)
             {
-                if (root.waypoints.Last().GetIntersectionLink(dir) != null)
+                bool isBackwardMove;
+                if(root.waypoints.Count - 2 >= 0)
                 {
-                    PathOpen newPath = (PathOpen)root.MemberwiseClone();
+                    isBackwardMove = root.waypoints.Last().GetIntersectionLink(dir) == root.waypoints[root.waypoints.Count - 2];
+                }
+                else
+                {
+                    isBackwardMove = false;
+                }
+                if (root.waypoints.Last().GetIntersectionLink(dir) != null && !isBackwardMove)
+                {
+                    PathOpen newPath = (PathOpen)root.Clone();
                     int addDist = root.waypoints.Last().GetLinkDistance(dir);
-                    newPath.distActual += addDist;
+                    newPath.distActualWorking += addDist;
                     newPath.waypoints.Add(root.waypoints.Last().GetIntersectionLink(dir));
                     pathBranches.Add(newPath);
                 }

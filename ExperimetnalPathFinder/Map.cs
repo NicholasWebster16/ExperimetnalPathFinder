@@ -348,14 +348,62 @@ namespace ExperimetnalPathFinder
             }
             System.Console.WriteLine(closingLines);
         }
+        public static void PrintPath(Path pathToPrint)
+        {
+            System.Console.WriteLine("Path:");
+            string closingLines = "--";
+            for (int x = 0; x < mapWidth; x++)
+            {
+                closingLines += "---";
+            }
+            System.Console.WriteLine(closingLines);
+            string outputString = "|";
+            for (int y = 0; y < mapHeight; y++)
+            {
+                for (int x = 0; x < mapWidth; x++)
+                {
+                    if (roadMap[y, x] != null)
+                    {
+                        bool isWaypoint = false;
+                        foreach (Road waypoint in pathToPrint.waypoints) {
+                            if (roadMap[y, x] == waypoint)
+                            {
+                                isWaypoint = true;
+                            }
+                        }
+                        if (isWaypoint)
+                        {
+                            outputString += " X ";
+                        }
+                        else
+                        {
+                            outputString += " - ";
+                        }
+                    }
+                    else
+                    {
+                        outputString += "   ";
+                    }
+                }
+                System.Console.WriteLine(outputString += "|");
+                outputString = "|";
+            }
+            System.Console.WriteLine(closingLines);
+        }
 
         public static void TestPathFinding()
         {
             System.Console.WriteLine("Testing Pathfinding");
+            /*
             Road source = roadMap[1, 0];
             Road dest = roadMap[9, 9];
+            */
+
+            Road source = roadMap[1, 0];
+            Road dest = roadMap[5, 4];
             Path newPath = Path.FindPath(source, dest);
             System.Console.WriteLine("Pathfinding Complete");
+            PrintPath(newPath);
 
         }
     }

@@ -69,8 +69,8 @@ namespace ExperimetnalPathFinder
                     return new KeyValuePair<Road, int>();
 
                 case Direction.North:
-                    checkY = (int)loc.Y + 1;
-                    while (checkY < mapHeight)
+                    checkY = (int)loc.Y - 1;
+                    while (checkY >= 0)
                     {
                         if (roadMap[checkY, checkX] != null)
                         {
@@ -79,13 +79,13 @@ namespace ExperimetnalPathFinder
                                 return new KeyValuePair<Road, int>(roadMap[checkY, checkX], Math.Abs(checkY - (int)loc.Y));
                             }
                         }
-                        checkY++;
+                        checkY--;
                     }
                     return new KeyValuePair<Road, int>();
 
                 case Direction.South:
-                    checkY = (int)loc.Y - 1;
-                    while (checkY >= 0)
+                    checkY = (int)loc.Y + 1;
+                    while (checkY < mapHeight)
                     {
                         if ( roadMap[checkY, checkX] != null)
                         {
@@ -94,7 +94,7 @@ namespace ExperimetnalPathFinder
                                 return new KeyValuePair<Road, int>(roadMap[checkY, checkX], Math.Abs(checkY - (int)loc.Y));
                             }
                         }
-                        checkY--;
+                        checkY++;
                     }
                     return new KeyValuePair<Road, int>();
             }
